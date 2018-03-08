@@ -5,10 +5,18 @@
       <% if current_user %>
         <ul class="nav navbar-nav pull-right">
           <li><%= link_to 'Log Out', logout_path, method: :delete %></li>
+          <%# TODO: Turn the following if/else logic into helper methods %>
+          <% if current_user.identities.where(provider: "facebook").empty? %>
+            <li><%= link_to 'Link Facebook', '/auth/facebook' %></li>
+          <% end %>
+          <% if current_user.identities.where(provider: "twitter").empty? %>
+            <li><%= link_to 'Link Twitter', '/auth/twitter' %></li>
+          <% end %>
         </ul>
       <% else %>
         <ul class="nav navbar-nav">
-          <li><%= link_to 'Twitter', '/auth/twitter' %></li>
+          <li><%= link_to 'Facebook', '/auth/facebook' %></li>
+          <li><%= link_to 'Twitter', '/auth/twitter' %></li>%>
         </ul>
       <% end %>
     </ul>
