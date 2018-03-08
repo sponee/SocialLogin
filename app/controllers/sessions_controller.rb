@@ -13,29 +13,34 @@ class SessionsController < ApplicationController
         # account. But we found the identity and the user associated with it
         # is the current user. So the identity is already associated with
         # this user. So let's display an error message.
-        redirect_to root_url, notice: "Already linked that account!"
+        flash[:notice] = "Already linked that account!"
       else
         # The identity is not associated with the current_user so lets
         # associate the identity
-        @identity.user = current_user
-        @identity.save
-        redirect_to root_url, notice: "Successfully linked that account!"
+        if @identity.persisted?
+          flash[:error] = "That account is associated with another user!"
+        else
+          @identity.user = current_user
+          @identity.save
+          flash[:notice] = "Successfully linked that account!"
+        end
       end
     else
       if @identity.user.present?
         # The identity we found had a user associated with it so let's
         # just log them in here
         self.current_user = @identity.user
-        redirect_to root_url, notice: "Signed in!"
+        flash[:notice] = "Signed in!"
       else
         # No user associated with the identity so we need to create a new one
         user = User.create
         @identity.user_id = user.id
         @identity.save
         self.current_user = @identity.user
-        redirect_to root_url, notice: "Account created! Please finish registering"
+        flash[:notice] = "Account created!"
       end
     end
+    redirect_to root_url
   end
 
   def destroy
